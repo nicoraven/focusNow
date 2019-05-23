@@ -7,6 +7,6 @@
 				"default_title": "focusNow"
 		},
 		"chrome_url_overrides": {
-				"newtab": "launchpad.html"
+				"newtab": "index.html"
 		}
 }
