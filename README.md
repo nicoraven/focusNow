@@ -1,9 +1,8 @@
 # focusNow
 A Chrome extension that brings a focused to-do app to the newtab
 
----
 
-## Installation Instructions (Manual Upload)
+### Installation Instructions (Manual Upload)
 1. Open the Extension Management page by navigating to chrome://extensions.
 	* The Extension Management page can also be opened by clicking on the Chrome menu, hovering over More Tools then selecting Extensions.
 2. Enable Developer Mode by clicking the toggle switch next to Developer mode.
