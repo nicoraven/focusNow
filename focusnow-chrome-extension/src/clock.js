@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
+const moment = require('moment');
+
 class Clock extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        date: new Date()
+        time: new moment().format('LTS')
     };
   }
 
@@ -21,7 +23,7 @@ class Clock extends Component {
 
   tick() {
     this.setState({
-      date: new Date()
+      time: new moment().format('LTS')
     });
   }
 
@@ -29,7 +31,7 @@ class Clock extends Component {
     return (
       <div className="clock">
         <h1>It's time to take charge of your life.</h1>
-        <h2>{this.state.date.toLocaleTimeString('en-SG')}.</h2>
+        <h2>{this.state.time.toLowerCase()}.</h2>
       </div>
     );
   }
