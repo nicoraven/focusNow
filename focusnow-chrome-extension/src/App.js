@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
+
 import './App.css';
 
 const moment = require('moment');
@@ -7,11 +7,6 @@ const moment = require('moment');
 class App extends Component {
     constructor(){
         super();
-        // this.deleteHandler = this.deleteHandler.bind(this);
-        // this.editText = this.editText.bind(this);
-        // this.dragStart = this.dragStart.bind(this);
-        // this.drop = this.drop.bind(this);
-        // this.allowDrop = this.allowDrop.bind(this);
     }
 
     state = {
@@ -38,16 +33,12 @@ class App extends Component {
         let newEntry = [this.state.word, date];
 
         if (this.state.word.length < 1) {
-            // this.setState({className: classChange});
             alert("Please enter a todo item");
         }
         else if (this.state.word.length > 200){
-            // this.setState({className: classChange});
             alert("Your todo item should be less than 200 characters");
         }
         else {
-            // updatedList.push(newEntry);
-            // this.setState({word: clearWord, list: updatedList});
             this.setState({word: clearWord, list: [...this.state.list, newEntry]});
             console.log(this.state.list);
         }

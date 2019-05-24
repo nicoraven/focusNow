@@ -15,7 +15,7 @@
    },
   "content_scripts" : [
     {
-      "matches": [ "<all_urls>" ],
+      "matches": [ "https://*.nicoraven.com/*" ],
       "css": ["/static/css/app.css"],
       "js": ["/static/js/content.js"]
     }

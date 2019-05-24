@@ -15,13 +15,13 @@ body {
 }
 
 div {
-	border: 1px solid red;
+	/*border: 1px solid red;*/
 }
 
 #root {
 	width: 85%;
 	margin: 0 auto;
-	border: solid 2px blue;
+	/*border: solid 2px blue;*/
 }
 
 .warning{
@@ -71,7 +71,7 @@ table {
 }
 
 .card {
-	max-width: 100%;
+	max-width: 90%;
 	background-color: #FFFFFF;
 	display: block;
   margin: 10px auto;
