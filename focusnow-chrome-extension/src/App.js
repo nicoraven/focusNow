@@ -67,8 +67,11 @@ class App extends Component {
     }
 
     deleteHandler = (index) => {
-        console.log("deleting", index)
-        // console.log("index", index);
+        console.log("deleting", index);
+
+        let deletedList = this.state.deletedList;
+        deletedList.splice(index,1);
+        this.setState({deletedList: deletedList});
 
         // let updatedList = this.state.list;
         // let removedItem = updatedList.slice(index, index+1);
@@ -160,7 +163,7 @@ class DeletedItems extends React.Component {
                 <div className="card" key={index} id={index} draggable="true" onDragStart={this.props.dragStart}>
                     <p className="cardText">{item[0]}</p>
                     <p className="createdDate">date added<br/>{item[1]}</p>
-                    <button className="removeButton" onClick={this.props.deleteHandler}>remove</button>
+                    <button className="removeButton" onClick={() => this.props.deleteHandler(index)}>remove</button>
                 </div>
             )
         })
