@@ -241,7 +241,7 @@ class DeletedItems extends React.Component {
 
         return(
             <div className="board" onDrop={this.props.drop} onDragOver={this.props.allowDrop} >
-                <div className="header">things that have been archived.</div>
+                <div className="header">things that have been completed.</div>
                 {listItems}
             </div>
         );
