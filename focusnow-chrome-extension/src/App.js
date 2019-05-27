@@ -42,16 +42,14 @@ class App extends Component {
         let word = this.state.word.trim();
         let clearWord = "";
         let updatedList = this.state.list;
-        // let classChange = "warning";
-        // let classReset = "";
         // let category = "";
         let date = moment().format("D MMMM YYYY");
         let newEntry = [word, date];
         console.log('new entry', newEntry);
-        if (this.state.word.length < 1) {
-            alert("Please enter a todo item");
+        if (word.length < 1) {
+            alert("Please enter a todo item!");
         }
-        else if (this.state.word.length > 200){
+        else if (word.length > 200){
             alert("Your todo item should be less than 200 characters");
         }
         else {
