@@ -160,17 +160,17 @@ class App extends Component {
 
     // Drag functions
     allowDrop = (allowdropevent) => {
-        allowdropevent.preventDefault();
+        // allowdropevent.preventDefault();
     }
 
     dragStart = (dragevent) => {
-        dragevent.dataTransfer.setData("item", dragevent.target.id);
+        // dragevent.dataTransfer.setData("item", dragevent.target.id);
     }
 
     drop = (dropevent) => {
-        dropevent.preventDefault();
-        var data = dropevent.dataTransfer.getData("item");
-        dropevent.target.appendChild(document.getElementById(data));
+        // dropevent.preventDefault();
+        // var data = dropevent.dataTransfer.getData("item");
+        // dropevent.target.appendChild(document.getElementById(data));
     }
 
     getList = () => {
