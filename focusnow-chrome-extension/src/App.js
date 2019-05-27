@@ -21,9 +21,12 @@ class App extends Component {
     componentDidMount(){
         // let here = this;
         chrome.storage.sync.get(['list'], result=> {
-            console.log('after setting', result.list);
-            console.log('which this?', this);
+            // console.log('after setting', result.list);
             this.setState({list: result.list})
+        });
+        chrome.storage.sync.get(['deletedList'], result=> {
+            // console.log('after setting', result.list);
+            this.setState({deletedList: result.deletedList})
         });
     }
 
@@ -77,33 +80,61 @@ class App extends Component {
 
     archiveHandler = (index) => {
         console.log("index", index);
+        let here = this;
+        let archivedItem = [];
 
-        let updatedList = this.state.list;
-        let removedItem = updatedList.slice(index, index+1);
-        updatedList.splice(index,1);
-        console.log("removed ", removedItem);
-        this.setState({list: updatedList});
-        this.addDeleted(removedItem);
+        chrome.storage.sync.get(['list'], function(result) {
+            console.log('chrome storage get', result.list);
+
+            let updatedList = result.list;
+            archivedItem = updatedList.slice(index, index+1);
+            updatedList.splice(index,1);
+            console.log("removed ", archivedItem);
+
+            // updating pending list
+            chrome.storage.sync.set({list: updatedList}, function() {
+                console.log('list updated');
+                chrome.storage.sync.get(['list'], function(result) {
+                    console.log('after setting', result.list);
+                    here.setState({list: result.list})
+                    // add removedItem to deletedList
+                    here.addDeleted(archivedItem);
+                });
+            });
+        });
+    }
+
+    addDeleted = (item) => {
+        console.log("deleted", item);
+        let here = this;
+        // updating completed list
+        chrome.storage.sync.get(['deletedList'], function(result) {
+            let deletedList = result.deletedList;
+            chrome.storage.sync.set({deletedList: [...deletedList, item ]}, function() {
+                console.log('deletedList updated');
+                chrome.storage.sync.get(['deletedList'], function(result) {
+                    console.log('after setting', result.deletedList);
+                    here.setState({deletedList: result.deletedList})
+                });
+            });
+        });
     }
 
     deleteHandler = (index) => {
         console.log("deleting", index);
+        let here = this;
 
-        let deletedList = this.state.deletedList;
-        deletedList.splice(index,1);
-        this.setState({deletedList: deletedList});
-
-        // let updatedList = this.state.list;
-        // let removedItem = updatedList.slice(index, index+1);
-        // updatedList.splice(index,1);
-        // console.log("removed ", removedItem);
-        // this.setState({list: updatedList});
-        // this.addDeleted(removedItem);
-    }
-
-    addDeleted = (item) => {
-        console.log("deleted", item)
-        this.setState({deletedList: [...this.state.deletedList, item[0]]});
+        chrome.storage.sync.get(['deletedList'], function(result) {
+            let deletedList = result.deletedList;
+            deletedList.splice(index,1);
+            chrome.storage.sync.set({deletedList: deletedList}, function() {
+                console.log('completed item purged');
+                chrome.storage.sync.get(['deletedList'], function(result) {
+                    console.log('after setting', result.deletedList);
+                    here.setState({deletedList: result.deletedList})
+                });
+            });
+        });
     }
 
     editText = (index, text) => {
@@ -112,6 +143,19 @@ class App extends Component {
         updateList[index][0] = text;
         console.log("updating", text);
         this.setState({list: updateList});
+
+        let here = this;
+
+        chrome.storage.sync.get(['list'], function(result) {
+            let updateList = result.list;
+            updateList[index][0] = text;
+            chrome.storage.sync.set({list: updateList}, function() {
+                console.log('item updated');
+                chrome.storage.sync.get(['list'], function(result) {
+                    here.setState({list: result.list})
+                });
+            });
+        });
     }
 
     // Drag functions
@@ -190,8 +234,8 @@ class DeletedItems extends React.Component {
             console.log("archived ", item )
             return (
                 <div className="card" key={index} id={index} draggable="true" onDragStart={this.props.dragStart}>
-                    <p className="cardText">{item[0]}</p>
-                    <p className="createdDate">date added<br/>{item[1]}</p>
+                    <p className="cardText">{item[0][0]}</p>
+                    <p className="createdDate">date added<br/>{item[0][1]}</p>
                     <button className="removeButton" onClick={() => this.props.deleteHandler(index)}>remove</button>
                 </div>
             )
