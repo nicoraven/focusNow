@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import './App.css';
+// import './App.css';
 
 const moment = require('moment');
 
@@ -25,12 +25,14 @@ class App extends Component {
         console.log("word", this.state.word.length);
         console.log("list", this.state.list);
 
+        let word = this.state.word.trim();
         let clearWord = "";
         let updatedList = this.state.list;
         let classChange = "warning";
         let classReset = "";
+        let category = "";
         let date = moment().format("D MMMM YYYY");
-        let newEntry = [this.state.word, date];
+        let newEntry = [word, date];
 
         if (this.state.word.length < 1) {
             alert("Please enter a todo item");
@@ -41,6 +43,9 @@ class App extends Component {
         else {
             this.setState({word: clearWord, list: [...this.state.list, newEntry]});
             console.log(this.state.list);
+            // chrome.storage.sync.set({key: value}, function() {
+            //     console.log('Value is set to ' + value);
+            // });
         }
     }
 
@@ -50,7 +55,7 @@ class App extends Component {
         }
     }
 
-    deleteHandler = (index) => {
+    archiveHandler = (index) => {
         console.log("index", index);
 
         let updatedList = this.state.list;
@@ -59,6 +64,18 @@ class App extends Component {
         console.log("removed ", removedItem);
         this.setState({list: updatedList});
         this.addDeleted(removedItem);
+    }
+
+    deleteHandler = (index) => {
+        console.log("deleting", index)
+        // console.log("index", index);
+
+        // let updatedList = this.state.list;
+        // let removedItem = updatedList.slice(index, index+1);
+        // updatedList.splice(index,1);
+        // console.log("removed ", removedItem);
+        // this.setState({list: updatedList});
+        // this.addDeleted(removedItem);
     }
 
     addDeleted = (item) => {
@@ -103,7 +120,7 @@ class App extends Component {
                     editText={this.editText}
                 />
                 <p className="createdDate">date added<br/>{item[1]}</p>
-                <button className="removeButton" onClick={() => this.deleteHandler(index)}>remove</button>
+                <button className="removeButton" onClick={() => this.archiveHandler(index)}>completed</button>
             </div>
         )
     })
@@ -126,6 +143,7 @@ class App extends Component {
                         drop={this.drop}
                         dragStart={this.dragStart}
                         allowDrop={this.allowDrop}
+                        deleteHandler={this.deleteHandler}
                     />
                 </div>
 
@@ -142,6 +160,7 @@ class DeletedItems extends React.Component {
                 <div className="card" key={index} id={index} draggable="true" onDragStart={this.props.dragStart}>
                     <p className="cardText">{item[0]}</p>
                     <p className="createdDate">date added<br/>{item[1]}</p>
+                    <button className="removeButton" onClick={this.props.deleteHandler}>remove</button>
                 </div>
             )
         })
