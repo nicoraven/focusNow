@@ -1,3 +1,5 @@
+/*global chrome*/
+
 import React, { Component } from 'react';
 
 // import './App.css';
@@ -16,6 +18,15 @@ class App extends Component {
         className : ""
     }
 
+    componentDidMount(){
+        // let here = this;
+        chrome.storage.sync.get(['list'], result=> {
+            console.log('after setting', result.list);
+            console.log('which this?', this);
+            this.setState({list: result.list})
+        });
+    }
+
     changeHandler = (event) => {
         this.setState({word:event.target.value});
         console.log("change", event.target.value.length);
@@ -23,17 +34,17 @@ class App extends Component {
 
     submitHandler = (event) => {
         console.log("word", this.state.word.length);
-        console.log("list", this.state.list);
+        // console.log("list", this.state.list);
 
         let word = this.state.word.trim();
         let clearWord = "";
         let updatedList = this.state.list;
-        let classChange = "warning";
-        let classReset = "";
-        let category = "";
+        // let classChange = "warning";
+        // let classReset = "";
+        // let category = "";
         let date = moment().format("D MMMM YYYY");
         let newEntry = [word, date];
-
+        console.log('new entry', newEntry);
         if (this.state.word.length < 1) {
             alert("Please enter a todo item");
         }
@@ -41,12 +52,21 @@ class App extends Component {
             alert("Your todo item should be less than 200 characters");
         }
         else {
-            this.setState({word: clearWord, list: [...this.state.list, newEntry]});
-            console.log(this.state.list);
-            // chrome.storage.sync.set({key: value}, function() {
-            //     console.log('Value is set to ' + value);
-            // });
-        }
+            let here = this;
+            chrome.storage.sync.get(['list'], function(result) {
+                console.log('chrome storage get', result.list);
+                let list = result.list;
+                chrome.storage.sync.set({list: [...list, newEntry]}, function() {
+                    console.log('list updated');
+                    chrome.storage.sync.get(['list'], function(result) {
+                        console.log('after setting', result.list);
+                        here.setState({word: clearWord, list: result.list})
+                    });
+                });
+            });
+            // this.setState({word: clearWord});
+            // setTimeout(() => { this.setState({word: clearWord}); }, 50);
+        };
     }
 
     enterHandler = (event) => {
@@ -107,6 +127,15 @@ class App extends Component {
         dropevent.preventDefault();
         var data = dropevent.dataTransfer.getData("item");
         dropevent.target.appendChild(document.getElementById(data));
+    }
+
+    getList = () => {
+        let storedList = [];
+        chrome.storage.sync.get(['list'], function(result) {
+            storedList = result.list;
+        })
+        console.log(storedList);
+        this.setState({list: storedList});
     }
 
     render() {
