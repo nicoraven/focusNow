@@ -13,7 +13,7 @@ class App extends Component {
 
     state = {
         list : [],
-        deletedList : [],
+        // deletedList : [],
         word : "",
         className : ""
     }
@@ -24,10 +24,10 @@ class App extends Component {
             // console.log('after setting', result.list);
             this.setState({list: result.list})
         });
-        chrome.storage.sync.get(['deletedList'], result=> {
-            // console.log('after setting', result.list);
-            this.setState({deletedList: result.deletedList})
-        });
+        // chrome.storage.sync.get(['deletedList'], result=> {
+        //     // console.log('after setting', result.list);
+        //     this.setState({deletedList: result.deletedList})
+        // });
     }
 
     changeHandler = (event) => {
@@ -42,9 +42,9 @@ class App extends Component {
         let word = this.state.word.trim();
         let clearWord = "";
         let updatedList = this.state.list;
-        // let category = "";
+        let category = "inProgress";
         let date = moment().format("D MMMM YYYY");
-        let newEntry = [word, date];
+        let newEntry = [word, date, category];
         console.log('new entry', newEntry);
         if (word.length < 1) {
             alert("Please enter a todo item!");
@@ -60,7 +60,7 @@ class App extends Component {
                 chrome.storage.sync.set({list: [...list, newEntry]}, function() {
                     console.log('list updated');
                     chrome.storage.sync.get(['list'], function(result) {
-                        console.log('after setting', result.list);
+                        console.log('after submitting', result.list);
                         here.setState({word: clearWord, list: result.list})
                     });
                 });
@@ -85,9 +85,8 @@ class App extends Component {
             console.log('chrome storage get', result.list);
 
             let updatedList = result.list;
-            archivedItem = updatedList.slice(index, index+1);
-            updatedList.splice(index,1);
-            console.log("removed ", archivedItem);
+            console.log('item to archive', updatedList[index]);
+            updatedList[index][2] = "completed";
 
             // updating pending list
             chrome.storage.sync.set({list: updatedList}, function() {
@@ -96,40 +95,42 @@ class App extends Component {
                     console.log('after setting', result.list);
                     here.setState({list: result.list})
                     // add removedItem to deletedList
-                    here.addDeleted(archivedItem);
+                    // here.addDeleted(archivedItem[0]);
                 });
             });
         });
     }
 
     addDeleted = (item) => {
-        console.log("deleted", item);
-        let here = this;
-        // updating completed list
-        chrome.storage.sync.get(['deletedList'], function(result) {
-            let deletedList = result.deletedList;
-            chrome.storage.sync.set({deletedList: [...deletedList, item ]}, function() {
-                console.log('deletedList updated');
-                chrome.storage.sync.get(['deletedList'], function(result) {
-                    console.log('after setting', result.deletedList);
-                    here.setState({deletedList: result.deletedList})
-                });
-            });
-        });
+        // console.log("deleted", item);
+        console.log("oops");
+        // let here = this;
+        // item[2] = "completed";
+        // // updating completed list
+        // chrome.storage.sync.get(['list'], function(result) {
+        //     let list = result.list;
+        //     chrome.storage.sync.set({list: [...list, item ]}, function() {
+        //         console.log('list updated');
+        //         chrome.storage.sync.get(['list'], function(result) {
+        //             console.log('after setting', result.list);
+        //             here.setState({list: result.list})
+        //         });
+        //     });
+        // });
     }
 
     deleteHandler = (index) => {
         console.log("deleting", index);
         let here = this;
 
-        chrome.storage.sync.get(['deletedList'], function(result) {
-            let deletedList = result.deletedList;
-            deletedList.splice(index,1);
-            chrome.storage.sync.set({deletedList: deletedList}, function() {
+        chrome.storage.sync.get(['list'], function(result) {
+            let list = result.list;
+            list.splice(index,1);
+            chrome.storage.sync.set({list: list}, function() {
                 console.log('completed item purged');
-                chrome.storage.sync.get(['deletedList'], function(result) {
-                    console.log('after setting', result.deletedList);
-                    here.setState({deletedList: result.deletedList})
+                chrome.storage.sync.get(['list'], function(result) {
+                    console.log('after setting', result.list);
+                    here.setState({list: result.list})
                 });
             });
         });
@@ -184,19 +185,25 @@ class App extends Component {
     // render the list with a map() here
     console.log("rendering");
 
+    let deletedList = [];
+
     let listItems = this.state.list.map((item, index) =>{
-        console.log(index, item);
-        return (
-            <div className="card" key={index} id={index} draggable="true" onDragStart={this.dragStart}>
-                <EditableLabel
-                    index={index}
-                    text={item[0]}
-                    editText={this.editText}
-                />
-                <p className="createdDate">date added<br/>{item[1]}</p>
-                <button className="removeButton" onClick={() => this.archiveHandler(index)}>completed</button>
-            </div>
-        )
+        if (item[2] === "completed") {
+            // console.log("in progress!", item);
+            deletedList = [...deletedList, item]
+        } else {
+            return (
+                <div className="card" key={index} id={index} draggable="false" onDragStart={this.dragStart}>
+                    <EditableLabel
+                        index={index}
+                        text={item[0]}
+                        editText={this.editText}
+                    />
+                    <p className="createdDate">date added<br/>{item[1]}</p>
+                    <button className="removeButton" onClick={() => this.archiveHandler(index)}>completed</button>
+                </div>
+            )
+        }
     })
 
         return (
@@ -213,7 +220,7 @@ class App extends Component {
                         {listItems}
                     </div>
                     <DeletedItems
-                        list={this.state.deletedList}
+                        list={deletedList}
                         drop={this.drop}
                         dragStart={this.dragStart}
                         allowDrop={this.allowDrop}
@@ -229,11 +236,11 @@ class App extends Component {
 class DeletedItems extends React.Component {
     render(){
         let listItems = this.props.list.map((item, index) =>{
-            console.log("archived ", item )
+
             return (
-                <div className="card" key={index} id={index} draggable="true" onDragStart={this.props.dragStart}>
-                    <p className="cardText">{item[0][0]}</p>
-                    <p className="createdDate">date added<br/>{item[0][1]}</p>
+                <div className="card" key={index} id={index} draggable="false" onDragStart={this.props.dragStart}>
+                    <p className="cardText">{item[0]}</p>
+                    <p className="createdDate">date added<br/>{item[1]}</p>
                     <button className="removeButton" onClick={() => this.props.deleteHandler(index)}>remove</button>
                 </div>
             )
