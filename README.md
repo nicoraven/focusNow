@@ -1,6 +1,9 @@
 # focusNow
 A Chrome extension that brings a focused to-do app to the newtab
 
+![Screenshot of extension](https://i.imgur.com/NNlGcDf.jpg "adding new items")
+
+![Screenshot of extension](https://i.imgur.com/akVVNMe.jpg "adding new items")
 
 ## Installation
 
