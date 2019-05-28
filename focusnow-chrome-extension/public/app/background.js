@@ -16,7 +16,12 @@ chrome.runtime.onInstalled.addListener(function(details){
             if (result.store === undefined) {
                 // alert('store not created yet');
                 // chrome.storage.sync.set({list: [], deletedList: []}, function() {
-                chrome.storage.sync.set({list: []}, function() {
+                chrome.storage.sync.set({
+                    list: {
+                        "pending": [],
+                        "completed": []
+                    }
+                }, function() {
                 // The value is now stored, so you don't have to do this again
                 // alert('storage created!');
                 });

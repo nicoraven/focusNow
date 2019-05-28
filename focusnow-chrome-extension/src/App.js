@@ -12,7 +12,10 @@ class App extends Component {
     }
 
     state = {
-        list : [],
+        list: {
+            "pending": [],
+            "completed": []
+        },
         // deletedList : [],
         word : "",
         className : ""
@@ -36,16 +39,15 @@ class App extends Component {
     }
 
     submitHandler = (event) => {
-        console.log("word", this.state.word.length);
-        // console.log("list", this.state.list);
+        // console.log("word", this.state.word.length);
+        let here = this;
+        let clearWord = "";
 
         let word = this.state.word.trim();
-        let clearWord = "";
-        let updatedList = this.state.list;
-        let category = "inProgress";
         let date = moment().format("D MMMM YYYY");
-        let newEntry = [word, date, category];
+        let newEntry = [word, date];
         console.log('new entry', newEntry);
+
         if (word.length < 1) {
             alert("Please enter a todo item!");
         }
@@ -53,20 +55,17 @@ class App extends Component {
             alert("Your todo item should be less than 200 characters");
         }
         else {
-            let here = this;
-            chrome.storage.sync.get(['list'], function(result) {
-                console.log('chrome storage get', result.list);
-                let list = result.list;
-                chrome.storage.sync.set({list: [...list, newEntry]}, function() {
-                    console.log('list updated');
-                    chrome.storage.sync.get(['list'], function(result) {
-                        console.log('after submitting', result.list);
-                        here.setState({word: clearWord, list: result.list})
-                    });
+            // let here = this;
+            let updatedList = this.state.list;
+            updatedList.pending = [...updatedList.pending, newEntry];
+
+            chrome.storage.sync.set({list: updatedList}, function() {
+                console.log('list updated');
+                chrome.storage.sync.get(['list'], function(result) {
+                    console.log('after submitting', result.list);
+                    here.setState({word: clearWord, list: result.list})
                 });
             });
-            // this.setState({word: clearWord});
-            // setTimeout(() => { this.setState({word: clearWord}); }, 50);
         };
     }
 
@@ -79,75 +78,52 @@ class App extends Component {
     archiveHandler = (index) => {
         console.log("index", index);
         let here = this;
-        let archivedItem = [];
 
-        chrome.storage.sync.get(['list'], function(result) {
-            console.log('chrome storage get', result.list);
+        let updatedList = this.state.list;
+        console.log('item to archive', updatedList.pending[index]);
 
-            let updatedList = result.list;
-            console.log('item to archive', updatedList[index]);
-            updatedList[index][2] = "completed";
+        // extract archived item and remove from pending list
+        let archivedItem = updatedList.pending.slice(index, index+1);
+        updatedList.pending.splice(index,1);
+        console.log("archived ", archivedItem[0]);
 
-            // updating pending list
-            chrome.storage.sync.set({list: updatedList}, function() {
-                console.log('list updated');
-                chrome.storage.sync.get(['list'], function(result) {
-                    console.log('after setting', result.list);
-                    here.setState({list: result.list})
-                    // add removedItem to deletedList
-                    // here.addDeleted(archivedItem[0]);
-                });
+        // add archived item to completed list
+        updatedList.completed = [...updatedList.completed, archivedItem[0]];
+
+        // updating list
+        chrome.storage.sync.set({list: updatedList}, function() {
+            console.log('list updated');
+            chrome.storage.sync.get(['list'], function(result) {
+                console.log('refreshing list', result.list);
+                here.setState({list: result.list})
             });
         });
-    }
-
-    addDeleted = (item) => {
-        // console.log("deleted", item);
-        console.log("oops");
-        // let here = this;
-        // item[2] = "completed";
-        // // updating completed list
-        // chrome.storage.sync.get(['list'], function(result) {
-        //     let list = result.list;
-        //     chrome.storage.sync.set({list: [...list, item ]}, function() {
-        //         console.log('list updated');
-        //         chrome.storage.sync.get(['list'], function(result) {
-        //             console.log('after setting', result.list);
-        //             here.setState({list: result.list})
-        //         });
-        //     });
-        // });
     }
 
     deleteHandler = (index) => {
         console.log("deleting", index);
         let here = this;
 
-        chrome.storage.sync.get(['list'], function(result) {
-            let list = result.list;
-            list.splice(index,1);
-            chrome.storage.sync.set({list: list}, function() {
-                console.log('completed item purged');
-                chrome.storage.sync.get(['list'], function(result) {
-                    console.log('after setting', result.list);
-                    here.setState({list: result.list})
-                });
+        let updatedList = this.state.list;
+        updatedList.completed.splice(index, 1);
+
+        chrome.storage.sync.set({list: updatedList}, function() {
+            console.log('completed item deleted');
+            chrome.storage.sync.get(['list'], function(result) {
+                console.log('refreshing list', result.list);
+                here.setState({list: result.list})
             });
         });
     }
 
     editText = (index, text) => {
-        let updateList = this.state.list;
-        console.log("Editing "+ updateList[index][0]);
-        updateList[index][0] = text;
-        console.log("updating", text);
-        this.setState({list: updateList});
-
         let here = this;
+        let updateList = this.state.list;
+
+        console.log("Editing "+ updateList.pending[index][0]);
+        updateList.pending[index][0] = text;
 
         chrome.storage.sync.get(['list'], function(result) {
-            let updateList = result.list;
-            updateList[index][0] = text;
             chrome.storage.sync.set({list: updateList}, function() {
                 console.log('item updated');
                 chrome.storage.sync.get(['list'], function(result) {
@@ -172,38 +148,25 @@ class App extends Component {
         // dropevent.target.appendChild(document.getElementById(data));
     }
 
-    getList = () => {
-        let storedList = [];
-        chrome.storage.sync.get(['list'], function(result) {
-            storedList = result.list;
-        })
-        console.log(storedList);
-        this.setState({list: storedList});
-    }
-
     render() {
     // render the list with a map() here
     console.log("rendering");
 
-    let deletedList = [];
+    let deletedList = this.state.list.completed;
+    let pendingList = this.state.list.pending;
 
-    let listItems = this.state.list.map((item, index) =>{
-        if (item[2] === "completed") {
-            // console.log("in progress!", item);
-            deletedList = [...deletedList, item]
-        } else {
-            return (
-                <div className="card" key={index} id={index} draggable="false" onDragStart={this.dragStart}>
-                    <EditableLabel
-                        index={index}
-                        text={item[0]}
-                        editText={this.editText}
-                    />
-                    <p className="createdDate">date added<br/>{item[1]}</p>
-                    <button className="removeButton" onClick={() => this.archiveHandler(index)}>completed</button>
-                </div>
-            )
-        }
+    let listItems = pendingList.map((item, index) =>{
+        return (
+            <div className="card" key={index} id={index} draggable="false" onDragStart={this.dragStart}>
+                <EditableLabel
+                    index={index}
+                    text={item[0]}
+                    editText={this.editText}
+                />
+                <p className="createdDate">date added<br/>{item[1]}</p>
+                <button className="removeButton" onClick={() => this.archiveHandler(index)}>completed</button>
+            </div>
+        )
     })
 
         return (
