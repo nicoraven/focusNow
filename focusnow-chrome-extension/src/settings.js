@@ -12,25 +12,42 @@ class Settings extends Component {
         let menu = document.querySelector(".settings-content");
         if (menu.style.display === "none") {
             menu.style.display = "";
+            this.closeMenu();
         } else {
             menu.style.display = "none";
         }
     }
 
     toggleDisplay = (event) => {
-        let menu = event.target.nextSibling;
-        if (menu.style.display === "none") {
-            menu.style.display = "";
-        } else {
+        // let menu = event.target.nextSibling;
+        // if (menu.style.display === "none") {
+        //     menu.style.display = "";
+        // } else {
+        //     menu.style.display = "none";
+        // };
+    }
+
+    closeMenu = () => {
+        console.log("standby to close menu");
+        let menu = document.querySelector(".settings-content");
+        document.addEventListener('click', this.byeMenu);
+    }
+
+    byeMenu = (event) => {
+        console.log('clicking');
+        let menu = document.querySelector(".settings-content");
+        if (menu !== event.target && !menu.contains(event.target)) {
+            console.log('clicking outside the menu');
             menu.style.display = "none";
-        };
+            document.removeEventListener('click', this.byeMenu);
+        }
     }
 
     render() {
         console.log("rendering settings");
 
         return (
-            <div className="settings">
+            <div className="settings" >
                 <img
                     className="icon"
                     src={gear}

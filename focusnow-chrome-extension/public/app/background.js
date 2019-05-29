@@ -26,10 +26,10 @@ chrome.runtime.onInstalled.addListener(function(details){
                 // alert('storage created!');
                 });
                 chrome.storage.sync.set({
-                    background: ""
+                    background: "#3EB690"
                 }, function() {
                 // The value is now stored, so you don't have to do this again
-                // alert('storage created!');
+                // alert('background set!');
                 });
             }
         });

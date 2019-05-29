@@ -127,6 +127,21 @@ class App extends Component {
         });
     }
 
+    shadowOn = () => {
+        let colour = "";
+        chrome.storage.sync.get(['background'], result=> {
+            colour = result.background;
+            console.log("shadow colour:", colour);
+            let i = document.querySelector(".Input-text");
+            i.style.boxShadow = "0.2rem 0.6rem 1.4rem #272424";
+        });
+    }
+
+    shadowOff = () => {
+        let i = document.querySelector(".Input-text");
+        i.style.boxShadow = "";
+    }
+
     // Drag functions
     allowDrop = (allowdropevent) => {
         allowdropevent.preventDefault();
@@ -191,7 +206,17 @@ class App extends Component {
             <div className="list">
                 <div className="Wrapper">
                     <div className="Input">
-                        <input type="text" id="input" className="Input-text" placeholder="Enter your todo item here" onChange={this.changeHandler} value={this.state.word} onKeyDown={this.enterHandler} />
+                        <input
+                            type="text"
+                            id="input"
+                            className="Input-text"
+                            placeholder="Enter your todo item here"
+                            value={this.state.word}
+                            onChange={this.changeHandler}
+                            onKeyDown={this.enterHandler}
+                            onFocus={this.shadowOn}
+                            onBlur={this.shadowOff}
+                        />
                         <label htmlFor="input" className="Input-label">Hit enter to save</label>
                     </div>
                     </div>
