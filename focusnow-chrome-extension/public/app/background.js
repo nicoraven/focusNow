@@ -25,6 +25,12 @@ chrome.runtime.onInstalled.addListener(function(details){
                 // The value is now stored, so you don't have to do this again
                 // alert('storage created!');
                 });
+                chrome.storage.sync.set({
+                    background: ""
+                }, function() {
+                // The value is now stored, so you don't have to do this again
+                // alert('storage created!');
+                });
             }
         });
     } else if(details.reason == "update"){
