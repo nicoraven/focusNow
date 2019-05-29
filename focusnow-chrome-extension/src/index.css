@@ -29,7 +29,7 @@ div {
 }
 
 .list {
-	width: 100%;
+	width: 90%;
 	margin: 0 auto;
 }
 
@@ -47,33 +47,37 @@ div {
 	font-size: 64px;
 }
 
-table {
-	width: 100%;
-	margin: 20px auto;
-	border-collapse: collapse;
-	font-size: 20px;
-}
-
-.header {
-	border: none;
-	border-radius: 0.4rem;
-	padding: 10px;
-	font-size: 30px;
-	/*background-color: #FFFFFF;*/
-	margin: 0 auto;
+.table {
+	display: flex;
+	align-items: flex-start;
 }
 
 .board {
 	background-color: #DADADA;
 	border: none;
-  border-radius: 0.4rem;
-  margin-bottom: 30px;
+	border-radius: 0.4rem;
+	margin: 0 10px 30px 10px;
+	width: 50%;
+}
+
+.header {
+	border: none;
+	border-radius: 0.4rem;
+	padding: 10px 14px;
+	font-size: 26px;
+	/*background-color: #FFFFFF;*/
+	margin: 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 105px;
 }
 
 .card {
 	max-width: 90%;
 	background-color: #FFFFFF;
-	display: block;
+	display: flex;
+	flex-direction: column;
   margin: 10px auto;
   padding: 10px 20px;
   border: none;
@@ -83,12 +87,14 @@ table {
 
 .cardText{
 	font-size: 22px;
+	margin: 10px;
+	word-break: break-word;
 }
 
 .Input-edit {
   margin: 0;
   padding: 10px 20px;
-  width: 70%;
+  /*width: 70%;*/
   border: none;
   border-radius: 0.4rem;
   font-family: inherit;
@@ -109,9 +115,8 @@ table {
 	font-size: 16px;
 	margin: 0;
 	display: block;
-  position: absolute;
-  top: 10%;
-  left: 4%;
+	order: -1;
+	text-align: left;
 }
 
 .removeButton {
@@ -122,10 +127,9 @@ table {
 	border: none;
 	border-radius: 0.4rem;
 	margin: 0;
-	position: absolute;
-	bottom: 10%;
-  right: 4%;
-  outline: none;
+	outline: none;
+	order: 2;
+	text-align: right;
 }
 
 .listText {
@@ -237,8 +241,9 @@ table {
 }
 
 .Input-text:focus {
-  outline: none;
-  box-shadow: 0.2rem 0.8rem 1.6rem var(--colorPrimary600);
+  /*outline: none;*/
+  /*box-shadow: 0.2rem 0.8rem 1.6rem #DADADA;*/
+  border: 2px solid black;
 }
 
 .Input-label {
@@ -246,7 +251,7 @@ table {
   position: absolute;
   bottom: 10%;
   left: 1rem;
-  color: #fff;
+  color: #282C2F;
   font-family: inherit;
   font-size: 28px;
   font-weight: inherit;
@@ -331,4 +336,47 @@ table {
   top: 10;
   background-color: #EEEEEE;
   border-right: 2px dotted red;
+}
+
+
+
+.settings {
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	width: 50px;
+}
+
+@media screen and (max-width: 500px) {
+	.board {
+		width: 100%;
+	}
+
+	.table {
+		flex-direction: column;
+	}
+}
+
+
+.settings:active {
+	top:6px;
+}
+
+.icon {
+	width: 50px;
+	height: 50px;
+}
+
+.palette {
+	width: 50px;
+	height: 50px;
+	border: 1px solid black;
+}
+
+.background-base {
+	background-color: #1BAA97 !important;
+}
+
+.background-white {
+	background-color: white !important;
 }

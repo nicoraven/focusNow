@@ -141,7 +141,7 @@ class App extends Component {
         event.preventDefault();
         let here = this;
 
-        if (event.target.className === "header") {
+        if (event.target.className === "board" || event.target.className === "header") {
             let updatedList = this.state.list;
             let index = dragged.id;
             let origin = dragged.parentNode.id;
