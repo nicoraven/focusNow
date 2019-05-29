@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 // import './App.css';
 
 const moment = require('moment');
+let dragged = "";
 
 class App extends Component {
     constructor(){
@@ -16,21 +17,15 @@ class App extends Component {
             "pending": [],
             "completed": []
         },
-        // deletedList : [],
         word : "",
         className : ""
     }
 
     componentDidMount(){
-        // let here = this;
+        // pull todo list after initialising
         chrome.storage.sync.get(['list'], result=> {
-            // console.log('after setting', result.list);
             this.setState({list: result.list})
         });
-        // chrome.storage.sync.get(['deletedList'], result=> {
-        //     // console.log('after setting', result.list);
-        //     this.setState({deletedList: result.deletedList})
-        // });
     }
 
     changeHandler = (event) => {
@@ -55,7 +50,6 @@ class App extends Component {
             alert("Your todo item should be less than 200 characters");
         }
         else {
-            // let here = this;
             let updatedList = this.state.list;
             updatedList.pending = [...updatedList.pending, newEntry];
 
@@ -135,17 +129,41 @@ class App extends Component {
 
     // Drag functions
     allowDrop = (allowdropevent) => {
-        // allowdropevent.preventDefault();
+        allowdropevent.preventDefault();
     }
 
-    dragStart = (dragevent) => {
-        // dragevent.dataTransfer.setData("item", dragevent.target.id);
+    dragStart = (event) => {
+        // store the item
+        dragged = event.target;
     }
 
-    drop = (dropevent) => {
-        // dropevent.preventDefault();
-        // var data = dropevent.dataTransfer.getData("item");
-        // dropevent.target.appendChild(document.getElementById(data));
+    drop = (event) => {
+        event.preventDefault();
+        let here = this;
+
+        if (event.target.className === "header") {
+            let updatedList = this.state.list;
+            let index = dragged.id;
+            let origin = dragged.parentNode.id;
+            let destination = event.target.id;
+
+            // extract dragged item and remove from original list
+            let draggedItem = updatedList[origin].slice(index, index+1);
+            updatedList[origin].splice(index,1);
+            console.log("moving ", draggedItem[0]);
+
+            // add dragged item to new list
+            updatedList[destination] = [...updatedList[destination], draggedItem[0]];
+
+            // updating list
+            chrome.storage.sync.set({list: updatedList}, function() {
+                console.log('list updated');
+                chrome.storage.sync.get(['list'], function(result) {
+                    console.log('refreshing list', result.list);
+                    here.setState({list: result.list})
+                });
+            });
+        }
     }
 
     render() {
@@ -157,7 +175,7 @@ class App extends Component {
 
     let listItems = pendingList.map((item, index) =>{
         return (
-            <div className="card" key={index} id={index} draggable="false" onDragStart={this.dragStart}>
+            <div className="card" key={index} id={index} draggable="true" onDragStart={this.dragStart}>
                 <EditableLabel
                     index={index}
                     text={item[0]}
@@ -178,8 +196,8 @@ class App extends Component {
                     </div>
                     </div>
                     <div className="table">
-                    <div className="board" onDrop={this.drop} onDragOver={this.allowDrop} >
-                        <div className="header">things to do.</div>
+                    <div id="pending" className="board" onDrop={this.drop} onDragOver={this.allowDrop} >
+                        <div id="pending" className="header">things to do.</div>
                         {listItems}
                     </div>
                     <DeletedItems
@@ -201,7 +219,7 @@ class DeletedItems extends React.Component {
         let listItems = this.props.list.map((item, index) =>{
 
             return (
-                <div className="card" key={index} id={index} draggable="false" onDragStart={this.props.dragStart}>
+                <div className="card" key={index} id={index} draggable="true" onDragStart={this.props.dragStart}>
                     <p className="cardText">{item[0]}</p>
                     <p className="createdDate">date added<br/>{item[1]}</p>
                     <button className="removeButton" onClick={() => this.props.deleteHandler(index)}>remove</button>
@@ -210,8 +228,8 @@ class DeletedItems extends React.Component {
         })
 
         return(
-            <div className="board" onDrop={this.props.drop} onDragOver={this.props.allowDrop} >
-                <div className="header">things that have been completed.</div>
+            <div id="completed" className="board" onDrop={this.props.drop} onDragOver={this.props.allowDrop} >
+                <div id="completed" className="header">things that have been completed.</div>
                 {listItems}
             </div>
         );
