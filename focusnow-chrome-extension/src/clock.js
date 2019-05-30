@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Quote from './quote';
+
 const moment = require('moment');
 
 class Clock extends Component {
@@ -30,7 +32,7 @@ class Clock extends Component {
   render() {
     return (
       <div className="clock">
-        <h1>It's time to take charge of your life.</h1>
+        <Quote />
         <h2>{this.state.time.toLowerCase()}.</h2>
       </div>
     );

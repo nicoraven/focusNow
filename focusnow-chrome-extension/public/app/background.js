@@ -26,15 +26,22 @@ chrome.runtime.onInstalled.addListener(function(details){
                 // alert('storage created!');
                 });
                 chrome.storage.sync.set({
-                    background: "#3EB690"
+                    background: "#3EB690",
+                    quote: "It's time to take charge of your life."
                 }, function() {
                 // The value is now stored, so you don't have to do this again
-                // alert('background set!');
+                // alert('background and quote set!');
                 });
             }
         });
     } else if(details.reason == "update"){
         var thisVersion = chrome.runtime.getManifest().version;
         console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
+        chrome.storage.sync.set({
+            quote: "It's time to take charge of your life."
+        }, function() {
+        // The value is now stored, so you don't have to do this again
+        // alert('quote set!');
+        });
     }
 });

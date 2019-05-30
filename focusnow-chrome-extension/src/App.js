@@ -275,10 +275,11 @@ class EditableLabel extends React.Component {
     }
 
     validateEdit = (event) => {
-        if (event.target.value.length < 1) {
-            alert("Your edited item is too short!");
+        if (event.target.value.trim().length < 1) {
+            // alert("Your edited item is too short!");
+            this.setState({editing: false});
         }
-        else if (event.target.value.length > 200){
+        else if (event.target.value.trim().length > 200){
             alert("Your edited item should be less than 200 characters");
         }
         else {

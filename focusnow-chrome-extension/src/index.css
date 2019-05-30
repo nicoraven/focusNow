@@ -39,10 +39,6 @@ div {
 	margin: 30px auto 60px auto;
 }
 
-.clock>h1 {
-	font-size: 46px;
-}
-
 .clock>h2 {
 	font-size: 64px;
 }
@@ -389,4 +385,25 @@ div {
 .background-settings > p {
 	font-family: inherit;
 	font-size: 15px;
+}
+
+.quote {
+	font-size: 46px;
+}
+
+.quote-edit {
+  margin: 0;
+  padding: 10px;
+  width: 80%;
+  border: none;
+  border-radius: 0.4rem;
+  font-family: inherit;
+  font-size: 46px;
+  font-weight: inherit;
+  text-align: center;
+  overflow: auto;
+}
+
+.quote-edit:focus {
+  outline: none;
 }
